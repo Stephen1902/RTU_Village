@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-#include "PlayerPawn.generated.h"
+#include "RTUV_PlayerPawn.generated.h"
+
+class USpringArmComponent;
 
 UCLASS()
 class RTU_VILLAGE_API ARTUV_PlayerPawn : public APawn
@@ -14,6 +16,8 @@ class RTU_VILLAGE_API ARTUV_PlayerPawn : public APawn
 public:
 	// Sets default values for this pawn's properties
 	ARTUV_PlayerPawn();
+
+	USpringArmComponent* GetSpringArmCompRef() const { return SpringArmComponent; } 
 
 protected:
 	// Called when the game starts or when spawned
@@ -26,7 +30,7 @@ protected:
 	UStaticMeshComponent* MeshComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player Pawn")
-	class USpringArmComponent* SpringArmComponent;
+	USpringArmComponent* SpringArmComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player Pawn")
 	class UCameraComponent* CameraComponent;
