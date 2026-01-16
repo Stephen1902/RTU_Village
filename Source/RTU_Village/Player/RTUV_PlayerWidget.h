@@ -56,13 +56,13 @@ protected:
 	UButton* BtnHuntIncrease;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player Widget", meta=(BindWidget))
-	UButton* BtnFoodReduce;
+	UButton* BtnCookReduce;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player Widget", meta=(BindWidget))
-	UTextBlock* TbFoodAssigned;
+	UTextBlock* TbCookAssigned;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player Widget", meta=(BindWidget))
-	UButton* BtnFoodIncrease;
+	UButton* BtnCookIncrease;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player Widget", meta=(BindWidget))
 	UButton* BtnDefenceReduce;
@@ -87,12 +87,18 @@ protected:
 
 public:
 	void NewDayStart(int32 CurrentDay, int32 TotalDays, int32 AvailablePeople, float DefenceComplete, int32 TreesStored, int32 RawFoodStored, int32 CookedFoodStored, int32 HousesBuilt);
-	
+	void OnDayEnd();
 private:
 	UPROPERTY()
 	class ARTUV_GameState* GameStateRef;
 
-	void NoAvailablePeople();
+	int32 UnassignedPeople;
+	int32 TreeAssigned;
+	int32 DefenceAssigned;
+	int32 HuntAssigned;
+	int32 CookAssigned;
+	int32 HousingAssigned;
+	void DealWithAvailablePeople(bool Available);
 
 	UFUNCTION()
 	void OnBtnTreeReduceClicked();
@@ -105,9 +111,9 @@ private:
 	void OnBtnHuntIncreaseClicked();
 
 	UFUNCTION()
-	void OnBtnFoodReduceClicked();
+	void OnBtnCookReduceClicked();
 	UFUNCTION()
-	void OnBtnFoodIncreaseClicked();
+	void OnBtnCookIncreaseClicked();
 
 	UFUNCTION()
 	void OnBtnDefenceReduceClicked();
@@ -119,5 +125,6 @@ private:
 	UFUNCTION()
 	void OnBtnHousingIncreaseClicked();
 
-	
+	UFUNCTION()
+	void OnBtnBeginDayClicked();
 };

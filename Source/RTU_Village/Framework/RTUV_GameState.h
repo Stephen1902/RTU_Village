@@ -125,7 +125,8 @@ private:
 	UPROPERTY()
 	UDataTable* ToolsDataTable;
 
-	
+public:
+	void OnStartDayClicked(class URTUV_PlayerWidget* WidgetRef, int32 TreeFellers, int32 DefenceBuilders, int32 HouseBuilders, int32 Hunters, int32 Cooks);
 	
 	
 };

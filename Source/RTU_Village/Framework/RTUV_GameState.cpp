@@ -1,6 +1,7 @@
 // Copyright 2026 DME Games
 
 #include "RTUV_GameState.h"
+#include "../Player/RTUV_PlayerWidget.h"
 
 ARTUV_GameState::ARTUV_GameState()
 {
@@ -21,7 +22,7 @@ ARTUV_GameState::ARTUV_GameState()
 	CookedFoodPerPerson = 4;
 	CookedFoodConsumed = 0.5f;
 	TreesNeededPerHouse = 8;
-	HouseBuiltPerPerson = 0.33f;
+	HouseBuiltPerPerson = 0.34f;
 
 	DaysBeforeUprising = 30;
 
@@ -32,4 +33,13 @@ ARTUV_GameState::ARTUV_GameState()
 	{
 		ToolsDataTable = DT.Object;
 	}
+}
+
+void ARTUV_GameState::OnStartDayClicked(URTUV_PlayerWidget* WidgetRef, int32 TreeFellers, int32 DefenceBuilders, int32 HouseBuilders, int32 Hunters, int32 Cooks)
+{
+	if (!WidgetRef) return;
+
+	
+
+	WidgetRef->OnDayEnd();
 }
