@@ -86,7 +86,7 @@ protected:
 	UButton* BtnBeginDay;
 
 public:
-	void NewDayStart(int32 CurrentDay, int32 TotalDays, int32 AvailablePeople, float DefenceComplete, int32 TreesStored, int32 RawFoodStored, int32 CookedFoodStored, int32 HousesBuilt);
+	void NewDayStart(int32 CurrentDay, int32 TotalDays, int32 AvailablePeople, float DefenceComplete, int32 TreesStored, int32 RawFoodStored, int32 CookedFoodStored, int32 HousesBuilt, int32 DefenceLastTurn, int32 TreesLastTurn, int32 HuntLastTurn, int32 CookLastTurn, int32 HousesLastTurn);
 	void OnDayEnd();
 private:
 	UPROPERTY()

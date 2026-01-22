@@ -1,7 +1,6 @@
 // Copyright 2026 DME Games
 
 #include "RTUV_PlayerController.h"
-
 #include "RTUV_PlayerPawn.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -12,6 +11,7 @@ ARTUV_PlayerController::ARTUV_PlayerController()
 	PrimaryActorTick.bCanEverTick = true;
 
 	PlayerPawnRef = nullptr;
+	bWidgetOnScreen = false;
 }
 
 void ARTUV_PlayerController::BeginPlay()
@@ -62,6 +62,22 @@ void ARTUV_PlayerController::SetupInputComponent()
 	InputComponent->BindAxis("MOUSEY");
 }
 
+void ARTUV_PlayerController::SetWidgetOnScreen(const bool WidgetState)
+{
+	bWidgetOnScreen = WidgetState;
+
+	if (bWidgetOnScreen)
+	{
+		SetInputMode(FInputModeUIOnly());
+		SetShowMouseCursor(true);
+	}
+	else
+	{
+		SetInputMode(FInputModeGameOnly());
+		SetShowMouseCursor(false);
+	}
+}
+
 float ARTUV_PlayerController::MovementSpeedCalculation() const
 {
 	if (PlayerPawnRef)
@@ -75,47 +91,53 @@ float ARTUV_PlayerController::MovementSpeedCalculation() const
 
 void ARTUV_PlayerController::MoveForward(float Value)
 {
-	if (Value != 0.f && !bDisableCamNav && PlayerPawnRef)
+	if (!bWidgetOnScreen)
 	{
-		// Calculate how much to move this time, based on zoom level and whether player is asking for fast move
-		const float MoveThisTime = (MovementSpeedCalculation() * FastMoveMultiplier) * Value;
-		// Create a vector that only allows forward and backward movement
-		const FVector NewVector = FVector(MoveThisTime, 0.f, 0.f);
-		// Get the player location and rotation, set the relative forward movement
-		const FTransform PlayerTransform = PlayerPawnRef->GetActorTransform();
-		const FVector ForwardTransform = UKismetMathLibrary::TransformDirection(PlayerTransform, NewVector);
-		// Add the new location to the existing location
-		const FVector NewLocation = PlayerTransform.GetLocation() + ForwardTransform;
-		// Make a new transform based on calculated and existing values
-		const FTransform NewTransform = FTransform(PlayerTransform.GetRotation(), NewLocation, PlayerTransform.GetScale3D());
-		// Set the player to the new location
-		PlayerPawnRef->SetActorTransform(NewTransform);
+		if (Value != 0.f && !bDisableCamNav && PlayerPawnRef)
+		{
+			// Calculate how much to move this time, based on zoom level and whether player is asking for fast move
+			const float MoveThisTime = (MovementSpeedCalculation() * FastMoveMultiplier) * Value;
+			// Create a vector that only allows forward and backward movement
+			const FVector NewVector = FVector(MoveThisTime, 0.f, 0.f);
+			// Get the player location and rotation, set the relative forward movement
+			const FTransform PlayerTransform = PlayerPawnRef->GetActorTransform();
+			const FVector ForwardTransform = UKismetMathLibrary::TransformDirection(PlayerTransform, NewVector);
+			// Add the new location to the existing location
+			const FVector NewLocation = PlayerTransform.GetLocation() + ForwardTransform;
+			// Make a new transform based on calculated and existing values
+			const FTransform NewTransform = FTransform(PlayerTransform.GetRotation(), NewLocation, PlayerTransform.GetScale3D());
+			// Set the player to the new location
+			PlayerPawnRef->SetActorTransform(NewTransform);
 
-		// When rotating, Z can be altered.  Correct this
-		PlayerPawnRef->SetActorLocation(FVector(PlayerPawnRef->GetActorLocation().X, PlayerPawnRef->GetActorLocation().Y, 100.f));
+			// When rotating, Z can be altered.  Correct this
+			PlayerPawnRef->SetActorLocation(FVector(PlayerPawnRef->GetActorLocation().X, PlayerPawnRef->GetActorLocation().Y, 100.f));
+		}
 	}
 }
 
 void ARTUV_PlayerController::MoveRight(float Value)
 {
-	if (Value != 0.f && !bDisableCamNav && PlayerPawnRef)
+	if (!bWidgetOnScreen)
 	{
-		// Calculate how much to move this time, based on zoom level and whether player is asking for fast move
-		const float MoveThisTime = (MovementSpeedCalculation() * FastMoveMultiplier) * Value;
-		// Create a vector that only allows forward and backward movement
-		const FVector NewVector = FVector(0.f, MoveThisTime, 0.f);
-		// Get the player location and rotation, set the relative forward movement
-		const FTransform PlayerTransform = PlayerPawnRef->GetActorTransform();
-		const FVector ForwardTransform = UKismetMathLibrary::TransformDirection(PlayerTransform, NewVector);
-		// Add the new location to the existing location
-		const FVector NewLocation = PlayerTransform.GetLocation() + ForwardTransform;
-		// Make a new transform based on calculated and existing values
-		const FTransform NewTransform = FTransform(PlayerTransform.GetRotation(), NewLocation, PlayerTransform.GetScale3D());
-		// Set the player to the new location
-		PlayerPawnRef->SetActorTransform(NewTransform);
+		if (Value != 0.f && !bDisableCamNav && PlayerPawnRef)
+		{
+			// Calculate how much to move this time, based on zoom level and whether player is asking for fast move
+			const float MoveThisTime = (MovementSpeedCalculation() * FastMoveMultiplier) * Value;
+			// Create a vector that only allows forward and backward movement
+			const FVector NewVector = FVector(0.f, MoveThisTime, 0.f);
+			// Get the player location and rotation, set the relative forward movement
+			const FTransform PlayerTransform = PlayerPawnRef->GetActorTransform();
+			const FVector ForwardTransform = UKismetMathLibrary::TransformDirection(PlayerTransform, NewVector);
+			// Add the new location to the existing location
+			const FVector NewLocation = PlayerTransform.GetLocation() + ForwardTransform;
+			// Make a new transform based on calculated and existing values
+			const FTransform NewTransform = FTransform(PlayerTransform.GetRotation(), NewLocation, PlayerTransform.GetScale3D());
+			// Set the player to the new location
+			PlayerPawnRef->SetActorTransform(NewTransform);
 
-		// When rotating, Z can be altered.  Correct this
-		PlayerPawnRef->SetActorLocation(FVector(PlayerPawnRef->GetActorLocation().X, PlayerPawnRef->GetActorLocation().Y, 100.f));
+			// When rotating, Z can be altered.  Correct this
+			PlayerPawnRef->SetActorLocation(FVector(PlayerPawnRef->GetActorLocation().X, PlayerPawnRef->GetActorLocation().Y, 100.f));
+		}
 	}
 }
 
@@ -143,96 +165,105 @@ void ARTUV_PlayerController::PanCameraReleased()
 
 void ARTUV_PlayerController::DealWithPanning()
 {
-	if (PlayerPawnRef)
+	if (!bWidgetOnScreen)
 	{
-		// Get the value the Mouse Axis and multiply by the pan sensitivity set in BP
-		const float MouseXFloat = InputComponent->GetAxisValue(TEXT("MOUSEX")) * PanSensitivity;
-		const float MouseYFloat = InputComponent->GetAxisValue(TEXT("MOUSEY")) * PanSensitivity;
-		// Get the current player rotation
-		FRotator PlayerRot = PlayerPawnRef->GetActorRotation();
-		// X runs on the Yaw.  Adjust this one only
-		const float NewYaw = PlayerRot.Yaw + MouseXFloat;
-		// Y runs on the Pitch.  Adjust this, but clamp it to avoid issues with clipping through the scenery
-		const float NewPitch = FMath::Clamp(PlayerRot.Pitch + MouseYFloat, -15.f, 45.f);
+		if (PlayerPawnRef)
+		{
+			// Get the value the Mouse Axis and multiply by the pan sensitivity set in BP
+			const float MouseXFloat = InputComponent->GetAxisValue(TEXT("MOUSEX")) * PanSensitivity;
+			const float MouseYFloat = InputComponent->GetAxisValue(TEXT("MOUSEY")) * PanSensitivity;
+			// Get the current player rotation
+			FRotator PlayerRot = PlayerPawnRef->GetActorRotation();
+			// X runs on the Yaw.  Adjust this one only
+			const float NewYaw = PlayerRot.Yaw + MouseXFloat;
+			// Y runs on the Pitch.  Adjust this, but clamp it to avoid issues with clipping through the scenery
+			const float NewPitch = FMath::Clamp(PlayerRot.Pitch + MouseYFloat, -15.f, 45.f);
 		
-		// Set the new actor Transform, based on the calculations above
-		PlayerPawnRef->SetActorRotation(FRotator(NewPitch, NewYaw, PlayerRot.Roll));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("No PlayerPawnRef in VVPlayerController."));
+			// Set the new actor Transform, based on the calculations above
+			PlayerPawnRef->SetActorRotation(FRotator(NewPitch, NewYaw, PlayerRot.Roll));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("No PlayerPawnRef in VVPlayerController."));
+		}
 	}
 }
 
 void ARTUV_PlayerController::Zoom(float Value)
 {
-	if (Value != 0.f && PlayerPawnRef)
+	if (!bWidgetOnScreen)
 	{
-		// Get the current arm length
-		float NewTargetLength = PlayerPawnRef->GetSpringArmCompRef()->TargetArmLength;
-		// Adjust the length depending on which way the mouse wheel has been moved
-		if (Value > 0.f)
+		if (Value != 0.f && PlayerPawnRef)
 		{
-			NewTargetLength -= ZoomStep;
+			// Get the current arm length
+			float NewTargetLength = PlayerPawnRef->GetSpringArmCompRef()->TargetArmLength;
+			// Adjust the length depending on which way the mouse wheel has been moved
+			if (Value > 0.f)
+			{
+				NewTargetLength -= ZoomStep;
+			}
+			else
+			{
+				NewTargetLength += ZoomStep;
+			}
+			// Clamp the value, based on the min and max zoom distances
+			NewTargetLength = FMath::Clamp(NewTargetLength, MinZoomDistance, MaxZoomDistance);
+			// Set the arm length
+			PlayerPawnRef->GetSpringArmCompRef()->TargetArmLength = NewTargetLength;
 		}
-		else
-		{
-			NewTargetLength += ZoomStep;
-		}
-		// Clamp the value, based on the min and max zoom distances
-		NewTargetLength = FMath::Clamp(NewTargetLength, MinZoomDistance, MaxZoomDistance);
-		// Set the arm length
-		PlayerPawnRef->GetSpringArmCompRef()->TargetArmLength = NewTargetLength;
 	}
 }
 
 void ARTUV_PlayerController::CheckForEdgeMovement()
 {
-	if (PlayerPawnRef)
+	if (!bWidgetOnScreen)
 	{
-		float MouseXFloat, MouseYFloat;
-		GetMousePosition(MouseXFloat, MouseYFloat);
-			
-		if (MouseXFloat != 0.f || MouseYFloat != 0.f)
+		if (PlayerPawnRef)
 		{
-			int32 ViewportX, ViewportY;
-			GetViewportSize(ViewportX, ViewportY);
-			float MouseLocX, MouseLocY;
-			GetMousePosition(MouseLocX, MouseLocY);
-
-			if (MouseXFloat != 0.f)
+			float MouseXFloat, MouseYFloat;
+			GetMousePosition(MouseXFloat, MouseYFloat);
+			
+			if (MouseXFloat != 0.f || MouseYFloat != 0.f)
 			{
-				if ((MouseLocX / ViewportX) > .975f)
+				int32 ViewportX, ViewportY;
+				GetViewportSize(ViewportX, ViewportY);
+				float MouseLocX, MouseLocY;
+				GetMousePosition(MouseLocX, MouseLocY);
+
+				if (MouseXFloat != 0.f)
 				{
-					EdgeMoveSpeedX = 5.0f * FastMoveMultiplier;
+					if ((MouseLocX / ViewportX) > .975f)
+					{
+						EdgeMoveSpeedX = 5.0f * FastMoveMultiplier;
+					}
+					else if ((MouseLocX / ViewportX) < .025f)
+					{
+						EdgeMoveSpeedX = -5.0f * FastMoveMultiplier;
+					}
+					else
+					{
+						EdgeMoveSpeedX = 0.f;
+					}
 				}
-				else if ((MouseLocX / ViewportX) < .025f)
+
+				if (MouseYFloat != 0.f)
 				{
-					EdgeMoveSpeedX = -5.0f * FastMoveMultiplier;
-				}
-				else
-				{
-					EdgeMoveSpeedX = 0.f;
+					if ((MouseLocY / ViewportY) > .975f)
+					{
+						EdgeMoveSpeedY = -5.0f * FastMoveMultiplier;
+					}
+					else if ((MouseLocY / ViewportY) < .025f)
+					{
+						EdgeMoveSpeedY = 5.0f * FastMoveMultiplier;
+					}
+					else
+					{
+						EdgeMoveSpeedY = 0.f;
+					}
 				}
 			}
 
-			if (MouseYFloat != 0.f)
-			{
-				if ((MouseLocY / ViewportY) > .975f)
-				{
-					EdgeMoveSpeedY = -5.0f * FastMoveMultiplier;
-				}
-				else if ((MouseLocY / ViewportY) < .025f)
-				{
-					EdgeMoveSpeedY = 5.0f * FastMoveMultiplier;
-				}
-				else
-				{
-					EdgeMoveSpeedY = 0.f;
-				}
-			}
+			PlayerPawnRef->AddActorLocalOffset(FVector(EdgeMoveSpeedY, EdgeMoveSpeedX, 0.f));
 		}
-
-		PlayerPawnRef->AddActorLocalOffset(FVector(EdgeMoveSpeedY, EdgeMoveSpeedX, 0.f));
 	}
 }

@@ -42,6 +42,9 @@ protected:
 	// Sets up the player input
 	virtual void SetupInputComponent() override;
 
+public:
+	void SetWidgetOnScreen(bool WidgetState);
+	
 private:
 	// function to adjust movement speed, depending on how far the camera is zoomed
 	float MovementSpeedCalculation() const;
@@ -65,4 +68,5 @@ private:
 	// Value that can be changed to move faster in the world
 	float FastMoveMultiplier = 1.0f;
 
+	bool bWidgetOnScreen;
 };

@@ -7,6 +7,8 @@
 #include "GameFramework/GameStateBase.h"
 #include "RTUV_GameState.generated.h"
 
+class URTUV_PlayerWidget;
+class ARTUV_PlayerPawn;
 /**
  * 
  */
@@ -54,6 +56,9 @@ class RTU_VILLAGE_API ARTUV_GameState : public AGameStateBase
 
 	ARTUV_GameState();
 protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+	
 	// The number of days before end game happens
 	UPROPERTY(EditDefaultsOnly, Category = "Game Start")
 	int32 DaysBeforeUprising;
@@ -121,12 +126,24 @@ protected:
 private:
 	int32 CurrentDay;
 	int32 Population;
+	int32 TreeFellersThisTurn;
+	int32 DefenceBuildersThisTurn;
+	int32 HouseBuildersThisTurn;
+	int32 HuntersThisTurn;
+	int32 CooksThisTurn;
 
 	UPROPERTY()
 	UDataTable* ToolsDataTable;
 
+	UPROPERTY()
+	ARTUV_PlayerPawn* PlayerRef;
+
+	UPROPERTY()
+	URTUV_PlayerWidget* PlayerWidgetRef;
+
+	void OnNewDayStarted();
 public:
-	void OnStartDayClicked(class URTUV_PlayerWidget* WidgetRef, int32 TreeFellers, int32 DefenceBuilders, int32 HouseBuilders, int32 Hunters, int32 Cooks);
+	void OnStartDayClicked(int32 TreeFellers, int32 DefenceBuilders, int32 HouseBuilders, int32 Hunters, int32 Cooks);
 	
-	
+	void SetPlayerReferences(ARTUV_PlayerPawn* PlayerRefIn, URTUV_PlayerWidget* WidgetRefIn);	
 };

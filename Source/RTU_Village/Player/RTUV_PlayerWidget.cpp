@@ -30,9 +30,20 @@ void URTUV_PlayerWidget::NativeConstruct()
 	BtnBeginDay->OnClicked.AddDynamic(this, &URTUV_PlayerWidget::OnBtnBeginDayClicked);
 }
 
-void URTUV_PlayerWidget::NewDayStart(int32 CurrentDay, int32 TotalDays, int32 AvailablePeople, float DefenceComplete, int32 TreesStored, int32 RawFoodStored, int32 CookedFoodStored, int32 HousesBuilt)
+void URTUV_PlayerWidget::NewDayStart(int32 CurrentDay, int32 TotalDays, int32 AvailablePeople, float DefenceComplete, int32 TreesStored, int32 RawFoodStored, int32 CookedFoodStored, int32 HousesBuilt, int32 DefenceLastTurn, int32 TreesLastTurn, int32 HuntLastTurn, int32 CookLastTurn, int32 HousesLastTurn)
 {
 	UnassignedPeople = AvailablePeople;
+	DealWithAvailablePeople(UnassignedPeople > 0);
+	const FText People = FText::FromString(FString::FromInt(AvailablePeople));
+	TbAvailablePeople->SetText(People);
+
+	const FText Days = FText::FromString(FString::FromInt(CurrentDay) + "/" + FString::FromInt(TotalDays));
+	TbDay->SetText((Days));
+
+	const FText Defence = FText::FromString(FString::SanitizeFloat(DefenceComplete) + "%");
+	TbDefenceComplete->SetText(Defence);
+
+	
 }
 
 void URTUV_PlayerWidget::OnDayEnd()
@@ -208,6 +219,6 @@ void URTUV_PlayerWidget::OnBtnBeginDayClicked()
 	}
 	else if (GameStateRef)
 	{
-		GameStateRef->OnStartDayClicked(this, TreeAssigned, DefenceAssigned, HuntAssigned, CookAssigned, HousingAssigned);
+		GameStateRef->OnStartDayClicked(TreeAssigned, DefenceAssigned, HuntAssigned, CookAssigned, HousingAssigned);
 	}
 }

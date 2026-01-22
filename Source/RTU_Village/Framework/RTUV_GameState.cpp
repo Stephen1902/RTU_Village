@@ -2,6 +2,7 @@
 
 #include "RTUV_GameState.h"
 #include "../Player/RTUV_PlayerWidget.h"
+#include "RTU_Village/Player/RTUV_PlayerPawn.h"
 
 ARTUV_GameState::ARTUV_GameState()
 {
@@ -28,6 +29,15 @@ ARTUV_GameState::ARTUV_GameState()
 
 	Population = 4;
 
+	PlayerRef = nullptr;
+	PlayerWidgetRef = nullptr;
+
+	TreeFellersThisTurn = 0;
+	DefenceBuildersThisTurn = 0;
+	HouseBuildersThisTurn = 0;
+	HuntersThisTurn = 0;
+	CooksThisTurn = 0;
+
 	static ConstructorHelpers::FObjectFinder<UDataTable> DT(TEXT("/Game/Framework/DT_GameTools"));
 	if (DT.Succeeded())
 	{
@@ -35,11 +45,60 @@ ARTUV_GameState::ARTUV_GameState()
 	}
 }
 
-void ARTUV_GameState::OnStartDayClicked(URTUV_PlayerWidget* WidgetRef, int32 TreeFellers, int32 DefenceBuilders, int32 HouseBuilders, int32 Hunters, int32 Cooks)
+void ARTUV_GameState::BeginPlay()
 {
-	if (!WidgetRef) return;
-
+	Super::BeginPlay();
 	
+}
 
-	WidgetRef->OnDayEnd();
+void ARTUV_GameState::OnNewDayStarted()
+{
+	if (!PlayerRef || !PlayerWidgetRef) return;
+
+	if (PlayerWidgetRef)
+	{
+		int32 AvailablePopulation = Population - (TreeFellersThisTurn + DefenceBuildersThisTurn + HouseBuildersThisTurn + HuntersThisTurn + CooksThisTurn);
+		if (AvailablePopulation < 0)
+		{
+			AvailablePopulation = Population;
+			TreesNeededPerHouse = 0;
+			DefenceBuildersThisTurn = 0;
+			HouseBuildersThisTurn = 0;
+			HuntersThisTurn = 0;
+			HuntersThisTurn = 0;
+			
+			UE_LOG(LogTemp, Warning, TEXT("There are more assigned workers than available population.  This should never happen."));	
+		}
+		
+		PlayerWidgetRef->NewDayStart(CurrentDay, DaysBeforeUprising, AvailablePopulation, DefenceComplete, TreesStored, RawFoodStored, CookFoodStored, HousesBuilt, DefenceBuildersThisTurn, TreeFellersThisTurn, HousesBuilt, CooksThisTurn, HouseBuildersThisTurn);
+	}
+	
+	if (PlayerRef)
+	{
+		PlayerRef->NewDayStarted();
+	}
+}
+
+void ARTUV_GameState::OnStartDayClicked(int32 TreeFellers, int32 DefenceBuilders, int32 HouseBuilders, int32 Hunters, int32 Cooks)
+{
+	if (!PlayerWidgetRef) return;
+
+	TreeFellersThisTurn = TreeFellers;
+	DefenceBuildersThisTurn = DefenceBuilders;
+	HouseBuildersThisTurn = HouseBuilders;
+	HuntersThisTurn = Hunters;
+	CooksThisTurn = Cooks;
+	
+	PlayerWidgetRef->OnDayEnd();
+}
+
+void ARTUV_GameState::SetPlayerReferences(ARTUV_PlayerPawn* PlayerRefIn, URTUV_PlayerWidget* WidgetRefIn)
+{
+	if (PlayerRef == nullptr)
+	{
+		PlayerWidgetRef = WidgetRefIn;
+
+		PlayerRef = PlayerRefIn;
+		OnNewDayStarted();
+	}
 }
