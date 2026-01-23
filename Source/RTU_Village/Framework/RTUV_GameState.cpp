@@ -28,6 +28,7 @@ ARTUV_GameState::ARTUV_GameState()
 	DaysBeforeUprising = 30;
 
 	Population = 4;
+	PeoplePerHouse = 2;
 
 	PlayerRef = nullptr;
 	PlayerWidgetRef = nullptr;
@@ -37,6 +38,8 @@ ARTUV_GameState::ARTUV_GameState()
 	HouseBuildersThisTurn = 0;
 	HuntersThisTurn = 0;
 	CooksThisTurn = 0;
+
+	bNPCDiedThisTurn = false;
 
 	static ConstructorHelpers::FObjectFinder<UDataTable> DT(TEXT("/Game/Framework/DT_GameTools"));
 	if (DT.Succeeded())
@@ -58,19 +61,19 @@ void ARTUV_GameState::OnNewDayStarted()
 	if (PlayerWidgetRef)
 	{
 		int32 AvailablePopulation = Population - (TreeFellersThisTurn + DefenceBuildersThisTurn + HouseBuildersThisTurn + HuntersThisTurn + CooksThisTurn);
-		if (AvailablePopulation < 0)
+		if (AvailablePopulation < 0 || bNPCDiedThisTurn)
 		{
 			AvailablePopulation = Population;
 			TreesNeededPerHouse = 0;
 			DefenceBuildersThisTurn = 0;
 			HouseBuildersThisTurn = 0;
 			HuntersThisTurn = 0;
-			HuntersThisTurn = 0;
-			
-			UE_LOG(LogTemp, Warning, TEXT("There are more assigned workers than available population.  This should never happen."));	
+			CooksThisTurn = 0;
+
+			bNPCDiedThisTurn = false;
 		}
 		
-		PlayerWidgetRef->NewDayStart(CurrentDay, DaysBeforeUprising, AvailablePopulation, DefenceComplete, TreesStored, RawFoodStored, CookFoodStored, HousesBuilt, DefenceBuildersThisTurn, TreeFellersThisTurn, HousesBuilt, CooksThisTurn, HouseBuildersThisTurn);
+		PlayerWidgetRef->NewDayStart(CurrentDay, DaysBeforeUprising, Population, AvailablePopulation, DefenceComplete, TreesStored, RawFoodStored, CookFoodStored, (HousesBuilt * PeoplePerHouse) - Population, DefenceBuildersThisTurn, TreeFellersThisTurn, HuntersThisTurn, CooksThisTurn, HouseBuildersThisTurn);
 	}
 	
 	if (PlayerRef)

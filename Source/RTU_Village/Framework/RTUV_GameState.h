@@ -79,6 +79,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Game Start")
 	float HousesBuilt;
 
+	// How many people each house can hold
+	UPROPERTY(EditDefaultsOnly, Category = "Game Start")
+	int32 PeoplePerHouse;
+
 	// Tools available at Begin Play
 	UPROPERTY(EditDefaultsOnly, Category = "Game Start")
 	TMap<EToolEnum, int32> AvailableTools;
@@ -142,6 +146,8 @@ private:
 	URTUV_PlayerWidget* PlayerWidgetRef;
 
 	void OnNewDayStarted();
+
+	bool bNPCDiedThisTurn;
 public:
 	void OnStartDayClicked(int32 TreeFellers, int32 DefenceBuilders, int32 HouseBuilders, int32 Hunters, int32 Cooks);
 	

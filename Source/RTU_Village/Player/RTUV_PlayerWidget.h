@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/TextBlock.h"
 #include "RTUV_PlayerWidget.generated.h"
 
 class UTextBlock;
@@ -21,6 +22,9 @@ class RTU_VILLAGE_API URTUV_PlayerWidget : public UUserWidget
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Player Widget", meta=(BindWidget))
 	UTextBlock* TbDay;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Player Widget", meta=(BindWidget))
+	UTextBlock* TbTotalPeople;
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Player Widget", meta=(BindWidget))
 	UTextBlock* TbAvailablePeople;
@@ -32,11 +36,14 @@ protected:
 	UTextBlock* TbTreeStore;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player Widget", meta=(BindWidget))
-	UTextBlock* TbFoodStore;
+	UTextBlock* TbRawFoodStore;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Player Widget", meta=(BindWidget))
+	UTextBlock* TbCookedFoodStore;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Player Widget", meta=(BindWidget))
 	UTextBlock* TbHousingAvailable;
-
+	
 	UPROPERTY(BlueprintReadOnly, Category = "Player Widget", meta=(BindWidget))
 	UButton* BtnTreeReduce;
 
@@ -86,7 +93,7 @@ protected:
 	UButton* BtnBeginDay;
 
 public:
-	void NewDayStart(int32 CurrentDay, int32 TotalDays, int32 AvailablePeople, float DefenceComplete, int32 TreesStored, int32 RawFoodStored, int32 CookedFoodStored, int32 HousesBuilt, int32 DefenceLastTurn, int32 TreesLastTurn, int32 HuntLastTurn, int32 CookLastTurn, int32 HousesLastTurn);
+	void NewDayStart(int32 CurrentDay, int32 TotalDays, int32 TotalPeople, int32 AvailablePeople, float DefenceComplete, int32 TreesStored, int32 RawFoodStored, int32 CookedFoodStored, int32 HousesAvailable, int32 DefenceLastTurn, int32 TreesLastTurn, int32 HuntLastTurn, int32 CookLastTurn, int32 HousesLastTurn);
 	void OnDayEnd();
 private:
 	UPROPERTY()
@@ -127,4 +134,6 @@ private:
 
 	UFUNCTION()
 	void OnBtnBeginDayClicked();
+
+	void AdjustValue(bool Increase, int32& Value, UTextBlock& TextBlock, UButton& Button);
 };
