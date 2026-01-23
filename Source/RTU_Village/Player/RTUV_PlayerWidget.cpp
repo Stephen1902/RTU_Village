@@ -4,6 +4,7 @@
 #include "../Framework/RTUV_GameState.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
+#include "Components/WidgetSwitcher.h"
 #include "Kismet/GameplayStatics.h"
 
 void URTUV_PlayerWidget::NativeConstruct()
@@ -35,12 +36,14 @@ void URTUV_PlayerWidget::NewDayStart(int32 CurrentDay, int32 TotalDays, int32 To
 {
 	UnassignedPeople = AvailablePeople;
 	DealWithAvailablePeople(UnassignedPeople > 0);
-	
-	const FText PeopleAvailable = FText::FromString(FString::FromInt(AvailablePeople));
-	TbAvailablePeople->SetText(PeopleAvailable);
 
-	const FText PeopleTotal = FText::FromString(FString::FromInt(TotalPeople));
-	TbTotalPeople->SetText(PeopleTotal);
+	// Update values in the text boxes with values that don't need a button
+	UpdateAssigned(AvailablePeople, *TbAvailablePeople);
+	UpdateAssigned(TotalPeople, *TbTotalPeople);
+	UpdateAssigned(TreesStored, *TbTreeAssigned);
+	UpdateAssigned(RawFoodStored, *TbRawFoodStore);
+	UpdateAssigned(CookedFoodStored, *TbCookedFoodStore);
+	UpdateAssigned(HousesAvailable, *TbHousingAvailable);
 	
 	const FText Days = FText::FromString(FString::FromInt(CurrentDay) + "/" + FString::FromInt(TotalDays));
 	TbDay->SetText((Days));
@@ -48,54 +51,29 @@ void URTUV_PlayerWidget::NewDayStart(int32 CurrentDay, int32 TotalDays, int32 To
 	const FText Defence = FText::FromString(FString::SanitizeFloat(DefenceComplete) + "%");
 	TbDefenceComplete->SetText(Defence);
 
-	const FText Trees = FText::FromString(FString::FromInt(TreesStored));
-	TbTreeStore->SetText(Trees);
-
-	const FText RawFood = FText::FromString(FString::FromInt(RawFoodStored));
-	TbRawFoodStore->SetText(RawFood);
-	
-	const FText CookedFood = FText::FromString(FString::FromInt(CookedFoodStored));
-	TbCookedFoodStore->SetText(CookedFood);
-
-	const FText Houses = FText::FromString(FString::FromInt(HousesAvailable));
-	TbHousingAvailable->SetText(Houses);
-
-	const FText DefenceLT = FText::FromString(FString::FromInt(DefenceLastTurn));
-	TbDefenceAssigned->SetText(DefenceLT);
-	if (DefenceLastTurn == 0)
-	{
-		BtnDefenceReduce->SetIsEnabled(false);
-	}
-
-	const FText TreesLT = FText::FromString(FString::FromInt(TreesLastTurn));
-	TbTreeAssigned->SetText(TreesLT);
-	if (TreesLastTurn == 0)
-	{
-		BtnTreeReduce->SetIsEnabled(false);
-	}
-
-	const FText HuntLT = FText::FromString(FString::FromInt(HuntLastTurn));
-	TbHuntAssigned->SetText(HuntLT);
-	if (HuntLastTurn == 0)
-	{
-		BtnHuntReduce->SetIsEnabled(false);
-	}
-
-	const FText CookLT = FText::FromString(FString::FromInt(CookLastTurn));
-	TbCookAssigned->SetText(CookLT);
-	if (CookLastTurn == 0)
-	{
-		BtnCookReduce->SetIsEnabled(false);
-	}
-
-	const FText HousesLT = FText::FromString(FString::FromInt(HousesLastTurn));
-	TbHousingAssigned->SetText(HousesLT);
-	if (HousesLastTurn == 0)
-	{
-		BtnHousingReduce->SetIsEnabled(false);
-	}
+	// Update  values in the text boxes that can be changed by a button 
+	UpdateAssignedButton(DefenceLastTurn, *TbDefenceAssigned, *BtnDefenceReduce);
+	UpdateAssignedButton(TreesLastTurn, *TbTreeAssigned, *BtnTreeReduce);
+	UpdateAssignedButton(HuntLastTurn, *TbHuntAssigned, *BtnHuntReduce);
+	UpdateAssignedButton(CookLastTurn, *TbCookAssigned, *BtnCookReduce);
+	UpdateAssignedButton(HousesLastTurn, *TbHousingAssigned, *BtnHousingReduce);
 }
 
+void URTUV_PlayerWidget::UpdateAssigned(int32 AssignedValue, UTextBlock& TextBlock)
+{
+	const FText IntAsText = FText::FromString(FString::FromInt(AssignedValue));
+	TextBlock.SetText(IntAsText);
+}
+
+void URTUV_PlayerWidget::UpdateAssignedButton(int32 AssignedValue,UTextBlock& TextBlock, UButton& Button)
+{
+	const FText IntAsText = FText::FromString(FString::FromInt(AssignedValue));
+	TextBlock.SetText(IntAsText);
+	if (AssignedValue == 0)
+	{
+		Button.SetIsEnabled(false);
+	}
+}
 
 void URTUV_PlayerWidget::OnBtnTreeReduceClicked()
 {
@@ -149,7 +127,7 @@ void URTUV_PlayerWidget::OnBtnHousingIncreaseClicked()
 
 void URTUV_PlayerWidget::OnDayEnd()
 {
-	
+	WidgetSwitcher->SetActiveWidgetIndex(2);
 }
 
 void URTUV_PlayerWidget::DealWithAvailablePeople(bool Available)
@@ -166,12 +144,30 @@ void URTUV_PlayerWidget::OnBtnBeginDayClicked()
 {
 	if (UnassignedPeople > 0)
 	{
-		// Show a box that not all people have been assigned	
+		WidgetSwitcher->SetActiveWidgetIndex(1);	
 	}
 	else if (GameStateRef)
 	{
 		GameStateRef->OnStartDayClicked(TreeAssigned, DefenceAssigned, HuntAssigned, CookAssigned, HousingAssigned);
 	}
+}
+
+void URTUV_PlayerWidget::OnBtnNotAssignedYesClicked()
+{
+	if (GameStateRef)
+	{
+		GameStateRef->OnStartDayClicked(TreeAssigned, DefenceAssigned, HuntAssigned, CookAssigned, HousingAssigned);
+	}
+}
+
+void URTUV_PlayerWidget::OnBtnNotAssignedNoClicked()
+{
+	WidgetSwitcher->SetActiveWidgetIndex(0);
+}
+
+void URTUV_PlayerWidget::OnBtnDayReviewClicked()
+{
+	WidgetSwitcher->SetActiveWidgetIndex(0);
 }
 
 void URTUV_PlayerWidget::AdjustValue(bool Increase, int32& Value, UTextBlock& TextBlock, UButton& Button)

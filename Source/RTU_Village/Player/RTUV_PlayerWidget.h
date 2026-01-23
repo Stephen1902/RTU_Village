@@ -9,6 +9,7 @@
 
 class UTextBlock;
 class UButton;
+class UWidgetSwitcher;
 
 /**
  * 
@@ -20,6 +21,9 @@ class RTU_VILLAGE_API URTUV_PlayerWidget : public UUserWidget
 
 	virtual void NativeConstruct() override;
 protected:
+	UPROPERTY(BlueprintReadOnly, Category = "Player Widget", meta=(BindWidget))
+	UWidgetSwitcher* WidgetSwitcher;
+	
 	UPROPERTY(BlueprintReadOnly, Category = "Player Widget", meta=(BindWidget))
 	UTextBlock* TbDay;
 
@@ -92,6 +96,18 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Player Widget", meta=(BindWidget))
 	UButton* BtnBeginDay;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Player Widget", meta=(BindWidget))
+	UButton* BtnNotAssignedYes;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Player Widget", meta=(BindWidget))
+	UButton* BtnNotAssignedNo;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Player Widget", meta=(BindWidget))
+	UTextBlock* TbDayReview;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Player Widget", meta=(BindWidget))
+	UButton* BtnDayReview;
+
 public:
 	void NewDayStart(int32 CurrentDay, int32 TotalDays, int32 TotalPeople, int32 AvailablePeople, float DefenceComplete, int32 TreesStored, int32 RawFoodStored, int32 CookedFoodStored, int32 HousesAvailable, int32 DefenceLastTurn, int32 TreesLastTurn, int32 HuntLastTurn, int32 CookLastTurn, int32 HousesLastTurn);
 	void OnDayEnd();
@@ -135,5 +151,15 @@ private:
 	UFUNCTION()
 	void OnBtnBeginDayClicked();
 
+	UFUNCTION()
+	void OnBtnNotAssignedYesClicked();
+	UFUNCTION()
+	void OnBtnNotAssignedNoClicked();
+
+	UFUNCTION()
+	void OnBtnDayReviewClicked();
+
 	void AdjustValue(bool Increase, int32& Value, UTextBlock& TextBlock, UButton& Button);
+	static void UpdateAssigned(int32 AssignedValue, UTextBlock& TextBlock);
+	static void UpdateAssignedButton(int32 AssignedValue, UTextBlock& TextBlock, UButton& Button);
 };
