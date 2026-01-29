@@ -23,7 +23,7 @@ ARTUV_GameState::ARTUV_GameState()
 	CookedFoodPerPerson = 4;
 	CookedFoodConsumed = 0.5f;
 	TreesNeededPerHouse = 8;
-	HouseBuiltPerPerson = 0.34f;
+	HouseBuiltPerPerson = 0.33f;
 
 	DaysBeforeUprising = 30;
 
@@ -82,6 +82,21 @@ void ARTUV_GameState::OnNewDayStarted()
 	}
 }
 
+void ARTUV_GameState::OnDayEnded()
+{
+	if (PlayerWidgetRef)
+	{
+		FString TextToSend = "The AI uprising has taken place";
+		if (CurrentDay > 1)
+		{
+			TextToSend = "Day review goes here.";				
+		}
+		PlayerWidgetRef->OnDayEnd(FText::FromString(TextToSend));
+	}
+
+	OnNewDayStarted();
+}
+
 void ARTUV_GameState::OnStartDayClicked(int32 TreeFellers, int32 DefenceBuilders, int32 HouseBuilders, int32 Hunters, int32 Cooks)
 {
 	if (!PlayerWidgetRef) return;
@@ -91,8 +106,9 @@ void ARTUV_GameState::OnStartDayClicked(int32 TreeFellers, int32 DefenceBuilders
 	HouseBuildersThisTurn = HouseBuilders;
 	HuntersThisTurn = Hunters;
 	CooksThisTurn = Cooks;
-	
-	PlayerWidgetRef->OnDayEnd();
+
+	CurrentDay += 1;
+	OnDayEnded();
 }
 
 void ARTUV_GameState::SetPlayerReferences(ARTUV_PlayerPawn* PlayerRefIn, URTUV_PlayerWidget* WidgetRefIn)
@@ -102,6 +118,6 @@ void ARTUV_GameState::SetPlayerReferences(ARTUV_PlayerPawn* PlayerRefIn, URTUV_P
 		PlayerWidgetRef = WidgetRefIn;
 
 		PlayerRef = PlayerRefIn;
-		OnNewDayStarted();
+		OnDayEnded();
 	}
 }

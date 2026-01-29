@@ -145,11 +145,13 @@ private:
 	UPROPERTY()
 	URTUV_PlayerWidget* PlayerWidgetRef;
 
-	void OnNewDayStarted();
-
 	bool bNPCDiedThisTurn;
 public:
 	void OnStartDayClicked(int32 TreeFellers, int32 DefenceBuilders, int32 HouseBuilders, int32 Hunters, int32 Cooks);
 	
-	void SetPlayerReferences(ARTUV_PlayerPawn* PlayerRefIn, URTUV_PlayerWidget* WidgetRefIn);	
+	void SetPlayerReferences(ARTUV_PlayerPawn* PlayerRefIn, URTUV_PlayerWidget* WidgetRefIn);
+
+	void OnNewDayStarted();
+	void OnDayEnded();
+	int32 GetCurrentDay() const { return CurrentDay; }
 };

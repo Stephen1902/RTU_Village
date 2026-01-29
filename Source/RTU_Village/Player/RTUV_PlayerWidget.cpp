@@ -29,6 +29,11 @@ void URTUV_PlayerWidget::NativeConstruct()
 	BtnHousingIncrease->OnClicked.AddDynamic(this, &URTUV_PlayerWidget::OnBtnHousingIncreaseClicked);
 
 	BtnBeginDay->OnClicked.AddDynamic(this, &URTUV_PlayerWidget::OnBtnBeginDayClicked);
+
+	BtnDayReview->OnClicked.AddDynamic(this, &URTUV_PlayerWidget::OnBtnDayReviewClicked);
+
+	BtnNotAssignedNo->OnClicked.AddDynamic(this, &URTUV_PlayerWidget::OnBtnNotAssignedNoClicked);
+	BtnNotAssignedYes->OnClicked.AddDynamic(this, &URTUV_PlayerWidget::OnBtnNotAssignedYesClicked);
 }
 
 void URTUV_PlayerWidget::NewDayStart(int32 CurrentDay, int32 TotalDays, int32 TotalPeople, int32 AvailablePeople, float DefenceComplete, int32 TreesStored, int32 RawFoodStored, int32 CookedFoodStored,
@@ -57,6 +62,14 @@ void URTUV_PlayerWidget::NewDayStart(int32 CurrentDay, int32 TotalDays, int32 To
 	UpdateAssignedButton(HuntLastTurn, *TbHuntAssigned, *BtnHuntReduce);
 	UpdateAssignedButton(CookLastTurn, *TbCookAssigned, *BtnCookReduce);
 	UpdateAssignedButton(HousesLastTurn, *TbHousingAssigned, *BtnHousingReduce);
+}
+
+void URTUV_PlayerWidget::OnDayEnd(const FText& TextIn)
+{
+	// Set the widget to the day review and display the text
+	WSPlayerWidget->SetActiveWidgetIndex(1);
+
+	TbDayReview->SetText(TextIn);
 }
 
 void URTUV_PlayerWidget::UpdateAssigned(int32 AssignedValue, UTextBlock& TextBlock)
@@ -125,11 +138,6 @@ void URTUV_PlayerWidget::OnBtnHousingIncreaseClicked()
 	AdjustValue(true, HousingAssigned, *TbHousingAssigned, *BtnHousingReduce);
 }
 
-void URTUV_PlayerWidget::OnDayEnd()
-{
-	WidgetSwitcher->SetActiveWidgetIndex(2);
-}
-
 void URTUV_PlayerWidget::DealWithAvailablePeople(bool Available)
 {
 	// Enable or disable the buttons
@@ -144,7 +152,7 @@ void URTUV_PlayerWidget::OnBtnBeginDayClicked()
 {
 	if (UnassignedPeople > 0)
 	{
-		WidgetSwitcher->SetActiveWidgetIndex(1);	
+		WSPlayerWidget->SetActiveWidgetIndex(2);	
 	}
 	else if (GameStateRef)
 	{
@@ -162,12 +170,12 @@ void URTUV_PlayerWidget::OnBtnNotAssignedYesClicked()
 
 void URTUV_PlayerWidget::OnBtnNotAssignedNoClicked()
 {
-	WidgetSwitcher->SetActiveWidgetIndex(0);
+	WSPlayerWidget->SetActiveWidgetIndex(0);
 }
 
 void URTUV_PlayerWidget::OnBtnDayReviewClicked()
 {
-	WidgetSwitcher->SetActiveWidgetIndex(0);
+	WSPlayerWidget->SetActiveWidgetIndex(0);
 }
 
 void URTUV_PlayerWidget::AdjustValue(bool Increase, int32& Value, UTextBlock& TextBlock, UButton& Button)
@@ -194,4 +202,9 @@ void URTUV_PlayerWidget::AdjustValue(bool Increase, int32& Value, UTextBlock& Te
 
 	const FText Assigned = FText::FromString(FString::FromInt(Value));
 	TextBlock.SetText(Assigned);
+}
+
+void URTUV_PlayerWidget::StartDay()
+{
+	
 }

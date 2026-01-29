@@ -22,7 +22,7 @@ class RTU_VILLAGE_API URTUV_PlayerWidget : public UUserWidget
 	virtual void NativeConstruct() override;
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Player Widget", meta=(BindWidget))
-	UWidgetSwitcher* WidgetSwitcher;
+	UWidgetSwitcher* WSPlayerWidget;
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Player Widget", meta=(BindWidget))
 	UTextBlock* TbDay;
@@ -110,7 +110,7 @@ protected:
 
 public:
 	void NewDayStart(int32 CurrentDay, int32 TotalDays, int32 TotalPeople, int32 AvailablePeople, float DefenceComplete, int32 TreesStored, int32 RawFoodStored, int32 CookedFoodStored, int32 HousesAvailable, int32 DefenceLastTurn, int32 TreesLastTurn, int32 HuntLastTurn, int32 CookLastTurn, int32 HousesLastTurn);
-	void OnDayEnd();
+	void OnDayEnd(const FText& TextIn);
 private:
 	UPROPERTY()
 	class ARTUV_GameState* GameStateRef;
@@ -162,4 +162,6 @@ private:
 	void AdjustValue(bool Increase, int32& Value, UTextBlock& TextBlock, UButton& Button);
 	static void UpdateAssigned(int32 AssignedValue, UTextBlock& TextBlock);
 	static void UpdateAssignedButton(int32 AssignedValue, UTextBlock& TextBlock, UButton& Button);
+
+	void StartDay();
 };

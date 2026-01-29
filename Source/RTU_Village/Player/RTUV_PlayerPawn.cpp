@@ -35,8 +35,12 @@ void ARTUV_PlayerPawn::NewDayStarted()
 {
 	if (PlayerWidgetRef && ControllerRef)
 	{
-		PlayerWidgetRef->AddToViewport();
-		ControllerRef->SetWidgetOnScreen(true);
+		// Check if the player widget is in the viewport, add it if not.
+		if (!PlayerWidgetRef->IsInViewport())
+		{
+			PlayerWidgetRef->AddToViewport();
+			ControllerRef->SetWidgetOnScreen(true);
+		}
 	}
 }
 
