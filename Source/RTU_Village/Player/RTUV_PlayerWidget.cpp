@@ -36,7 +36,7 @@ void URTUV_PlayerWidget::NativeConstruct()
 	BtnNotAssignedYes->OnClicked.AddDynamic(this, &URTUV_PlayerWidget::OnBtnNotAssignedYesClicked);
 }
 
-void URTUV_PlayerWidget::NewDayStart(int32 CurrentDay, int32 TotalDays, int32 TotalPeople, int32 AvailablePeople, float DefenceComplete, int32 TreesStored, int32 RawFoodStored, int32 CookedFoodStored,
+void URTUV_PlayerWidget::NewDayStart(int32 CurrentDay, int32 TotalDays, int32 TotalPeople, int32 AvailablePeople, float DefenceComplete, float TreesStored, int32 RawFoodStored, int32 CookedFoodStored,
 	int32 HousesAvailable, int32 DefenceLastTurn, int32 TreesLastTurn, int32 HuntLastTurn, int32 CookLastTurn, int32 HousesLastTurn)
 {
 	UnassignedPeople = AvailablePeople;
@@ -45,7 +45,7 @@ void URTUV_PlayerWidget::NewDayStart(int32 CurrentDay, int32 TotalDays, int32 To
 	// Update values in the text boxes with values that don't need a button
 	UpdateAssigned(AvailablePeople, *TbAvailablePeople);
 	UpdateAssigned(TotalPeople, *TbTotalPeople);
-	UpdateAssigned(TreesStored, *TbTreeAssigned);
+	UpdateAssigned(TreesStored, *TbTreeStore);
 	UpdateAssigned(RawFoodStored, *TbRawFoodStore);
 	UpdateAssigned(CookedFoodStored, *TbCookedFoodStore);
 	UpdateAssigned(HousesAvailable, *TbHousingAvailable);
@@ -74,6 +74,7 @@ void URTUV_PlayerWidget::OnDayEnd(const FText& TextIn)
 
 void URTUV_PlayerWidget::UpdateAssigned(int32 AssignedValue, UTextBlock& TextBlock)
 {
+	UE_LOG(LogTemp, Warning, TEXT("TextBox: %s, Assigned: %i"), *TextBlock.GetName(), AssignedValue);
 	const FText IntAsText = FText::FromString(FString::FromInt(AssignedValue));
 	TextBlock.SetText(IntAsText);
 }

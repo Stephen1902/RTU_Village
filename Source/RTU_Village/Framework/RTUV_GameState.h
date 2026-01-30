@@ -65,7 +65,7 @@ protected:
 
 	// How many trees are in storage at Begin Play
 	UPROPERTY(EditDefaultsOnly, Category = "Game Start")
-	int32 TreesStored;
+	float TreesStored;
 
 	// How much raw food is stored at Begin Play
 	UPROPERTY(EditDefaultsOnly, Category = "Game Start")
@@ -154,4 +154,14 @@ public:
 	void OnNewDayStarted();
 	void OnDayEnded();
 	int32 GetCurrentDay() const { return CurrentDay; }
+
+private:
+	float BuildDefence();
+	int32 HuntAnimals();
+	int32 CookFood();
+	float BuildHousing();
+	int32 ChopTrees();
+
+	float ChanceOfRandom;
+	void HandleRandomEvent();
 };
