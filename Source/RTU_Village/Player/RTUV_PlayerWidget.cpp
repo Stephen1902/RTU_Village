@@ -157,7 +157,7 @@ void URTUV_PlayerWidget::OnBtnBeginDayClicked()
 	}
 	else if (GameStateRef)
 	{
-		GameStateRef->OnStartDayClicked(TreeAssigned, DefenceAssigned, HuntAssigned, CookAssigned, HousingAssigned);
+		GameStateRef->OnStartDayClicked(TreeAssigned, DefenceAssigned, HousingAssigned, HuntAssigned, CookAssigned);
 	}
 }
 
@@ -165,7 +165,7 @@ void URTUV_PlayerWidget::OnBtnNotAssignedYesClicked()
 {
 	if (GameStateRef)
 	{
-		GameStateRef->OnStartDayClicked(TreeAssigned, DefenceAssigned, HuntAssigned, CookAssigned, HousingAssigned);
+		GameStateRef->OnStartDayClicked(TreeAssigned, DefenceAssigned, HousingAssigned, HuntAssigned, CookAssigned);
 	}
 }
 

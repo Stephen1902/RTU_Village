@@ -8,7 +8,7 @@ ARTUV_GameState::ARTUV_GameState()
 {
 	// Game start items
 	CurrentDay = 1;
-	TreesStored = 5;
+	TreesStored = 18;
 	RawFoodStored = 5;
 	CookFoodStored = 5;
 	HousesBuilt = 2;
@@ -22,7 +22,7 @@ ARTUV_GameState::ARTUV_GameState()
 	RawFoodForCookedFood = 1.0f;
 	CookedFoodPerPerson = 2;
 	CookedFoodConsumed = 0.5f;
-	TreesNeededPerHouse = 6;
+	TreesNeededPerHouse = 18;
 	HouseBuiltPerPerson = 0.33f;
 
 	DaysBeforeUprising = 30;
@@ -107,18 +107,35 @@ void ARTUV_GameState::OnDayEnded()
 		+ FString::FromInt(DaysBeforeUprising) + " days to build your defences, and to make sure your community is fed and housed.\n\nGood luck.";
 		if (CurrentDay > 1)
 		{
-			TextToSend = "Nothing happened.";
-			if (DefenceBuilt > 0.f)
+			TextToSend = "";
+			if (DefenceBuilt == 0.f && AnimalsHunted == 0 && HousingBuilt == 0.f && FoodCooked == 0 && TreesChopped == 0)
 			{
-				TextToSend = FString::SanitizeFloat(DefenceBuilt) + "% of defence was built.\n\n";		
+				TextToSend = "Nothing happened.";
 			}
-
-			if (AnimalsHunted > 0)
+			else
 			{
-				TextToSend += FString::FromInt(AnimalsHunted) + "raw meat was added.\n\n";
-			}
+				if (DefenceBuilt > 0.f)
+				{
+					TextToSend = FString::SanitizeFloat(DefenceBuilt) + "% of defence was built.\n\n";		
+				}
 
-			
+				if (AnimalsHunted > 0)
+				{
+					TextToSend += FString::FromInt(AnimalsHunted) + " raw meat was added.\n\n";
+				}
+
+				if (HousingBuilt > 0.f)
+				{
+					if (HousingBuilt == 1.0f)
+					{
+						TextToSend += "A new house was built.  Your settlement can now house 2 more people.\n\n";
+					}
+					else
+					{
+						TextToSend += FString::SanitizeFloat(HousingBuilt) + "% of a new house was built.\n\n";
+					}
+				}
+			}
 		}
 		PlayerWidgetRef->OnDayEnd(FText::FromString(TextToSend));
 	}
@@ -205,8 +222,35 @@ int32 ARTUV_GameState::CookFood()
 
 float ARTUV_GameState::BuildHousing()
 {
-	
-	return 0.f;
+	float AmountToReturn = 0.f;
+
+	// Check if there are any people assigned to build houses and if there are any trees stored
+	if (HouseBuildersThisTurn > 0 && TreesStored > 0)
+	{
+		// Check there is enough trees for the number of builders
+		if (FMath::RoundToZero(HouseBuildersThisTurn * (TreesNeededPerHouse * HouseBuiltPerPerson)) <= TreesStored)
+		{
+			AmountToReturn = HouseBuildersThisTurn * HouseBuiltPerPerson;
+			TreesStored -= FMath::CeilToFloat(HouseBuildersThisTurn * (TreesNeededPerHouse * HouseBuiltPerPerson));
+		}
+		else
+		{
+			// There is not.  Build as much of a house as possible with the trees available
+			AmountToReturn = 1.0f - ((TreesNeededPerHouse - TreesStored) / TreesNeededPerHouse);
+			TreesStored = 0;
+		}
+	}
+
+	// It's possible that there is 0.99 of a house built.  Round this up to a whole house.
+	const int32 WholeValue = static_cast<int>(AmountToReturn);
+	const double Remainder = AmountToReturn - WholeValue;
+	if (Remainder == 0.99f)
+	{
+		AmountToReturn = WholeValue + 1.0f;
+	}
+
+	HousesBuilt += AmountToReturn;
+	return AmountToReturn;
 }
 
 int32 ARTUV_GameState::ChopTrees()
