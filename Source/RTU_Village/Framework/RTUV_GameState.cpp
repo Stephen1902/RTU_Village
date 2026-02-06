@@ -228,7 +228,41 @@ float ARTUV_GameState::BuildDefence()
 
 int32 ARTUV_GameState::HuntAnimals()
 {
-	return HuntersThisTurn * RawFoodPerPerson;
+	int32 AmountToReturn = 0;
+
+	if (HuntersThisTurn > 0)
+	{
+		AmountToReturn = HuntersThisTurn * RawFoodPerPerson;
+		
+		// Get the number of axes currently available
+		const int32 NumOfBows = AvailableTools[EToolEnum::EBow];
+
+		if (NumOfBows > 0)
+		{
+			int32 NumWithBows;
+			int32 NumWithoutBows;
+	
+			// Check if there are enough Bows for every person assigned
+			if (TreeFellersThisTurn > NumOfBows)
+			{
+				// There are more people than Bows available
+				NumWithBows = NumOfBows;
+				NumWithoutBows = HuntersThisTurn - NumOfBows;
+			}
+			else
+			{
+				// Everyone gets an axe
+				NumWithBows = HuntersThisTurn;
+				NumWithoutBows = 0;
+			}
+
+			AmountToReturn = (NumWithoutBows * HuntersThisTurn) + (NumWithBows * (RawFoodPerPerson + (RawFoodPerPerson * IncreaseBow)));
+		}
+		
+		RawFoodStored += AmountToReturn;
+	}
+	
+	return AmountToReturn;
 }
 
 int32 ARTUV_GameState::CookFood()
