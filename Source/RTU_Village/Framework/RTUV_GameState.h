@@ -86,6 +86,21 @@ protected:
 	// Tools available at Begin Play
 	UPROPERTY(EditDefaultsOnly, Category = "Game Start")
 	TMap<EToolEnum, int32> AvailableTools;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Game Start")
+	int32 ToolStartAxe;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Game Start")
+	int32 ToolStartShovel;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Game Start")
+	int32 ToolStartHammer;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Game Start")
+	int32 ToolStartBow;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Game Start")
+	int32 ToolStartKnife;
 	
 	// The amount of defence completed
 	UPROPERTY(VisibleAnywhere, Category = "Gameplay")
@@ -164,4 +179,10 @@ private:
 
 	float ChanceOfRandom;
 	void HandleRandomEvent();
+
+	float IncreaseAxe;
+	float IncreaseShovel;
+	float IncreaseHammer;
+	float IncreaseBow;
+	float IncreaseKnife;
 };
